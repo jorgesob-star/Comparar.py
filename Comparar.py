@@ -43,11 +43,11 @@ if st.session_state.show_inputs:
     col1, col2 = st.columns(2)
 
     with col1:
-        st.subheader("Opção 1")
+        st.subheader("Alugado")
         st.number_input("🏠 Aluguer (€)", min_value=0.0, value=st.session_state.aluguer, step=1.0, key='aluguer')
         st.number_input("👔 Percentual (%)", min_value=0.0, value=st.session_state.perc_aluguer, step=0.5, key='perc_aluguer')
     with col2:
-        st.subheader("Opção 2")
+        st.subheader("Próprio")
         st.number_input("🛡️ Seguro (€)", min_value=0.0, value=st.session_state.seguro, step=1.0, key='seguro')
         st.number_input("👔 Percentual (%)", min_value=0.0, value=st.session_state.perc_seguro, step=0.5, key='perc_seguro')
         st.number_input("🛠️ Manutenção (€)", min_value=0.0, value=st.session_state.manutencao, step=1.0, key='manutencao')
