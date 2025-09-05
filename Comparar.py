@@ -4,6 +4,20 @@ import streamlit as st
 st.set_page_config(page_title="Comparador de Descontos", layout="centered")
 st.title("💸 Comparador de Descontos")
 
+# --- Definição dos valores padrão iniciais ---
+DEFAULTS = {
+    'aluguer': 280.0,
+    'perc_aluguer': 7.0,
+    'seguro': 45.0,
+    'perc_seguro': 12.0,
+    'manutencao': 20.0
+}
+
+# Inicializa o estado da sessão com os valores padrão, se ainda não existirem
+for key, value in DEFAULTS.items():
+    if f'default_{key}' not in st.session_state:
+        st.session_state[f'default_{key}'] = value
+
 # --- Entradas do Usuário ---
 st.header("Entradas do Usuário")
 
@@ -15,43 +29,37 @@ st.markdown("---")
 # --- Lógica para mostrar as opções ---
 st.header("Opções da Empresa")
 
-# Define os valores padrão para as opções
-aluguer_padrao = 280.0
-perc_aluguer_padrao = 7.0
-seguro_padrao = 45.0
-perc_seguro_padrao = 12.0
-manutencao_padrao = 20.0  # Novo valor padrão para manutenção
-
-# Inicializa o estado de exibição se ainda não existir
-if 'show_inputs' not in st.session_state:
-    st.session_state.show_inputs = False
-
 # Botão para alternar a visibilidade dos campos de entrada
 if st.button("Modificar Opções Padrão"):
-    st.session_state.show_inputs = not st.session_state.show_inputs
+    st.session_state.show_inputs = not st.session_state.get('show_inputs', False)
 
-if st.session_state.show_inputs:
-    # Colunas para organizar as opções lado a lado, apenas quando os inputs estão visíveis
+def save_defaults():
+    """Função de callback para salvar os valores dos inputs como novos padrões."""
+    st.session_state.default_aluguer = st.session_state.aluguer_input
+    st.session_state.default_perc_aluguer = st.session_state.perc_aluguer_input
+    st.session_state.default_seguro = st.session_state.seguro_input
+    st.session_state.default_perc_seguro = st.session_state.perc_seguro_input
+    st.session_state.default_manutencao = st.session_state.manutencao_input
+    st.success("Novos valores padrão salvos com sucesso!")
+
+if st.session_state.get('show_inputs', False):
+    # Colunas para organizar as opções lado a lado
     col1, col2 = st.columns(2)
 
     with col1:
         st.subheader("Opção 1")
-        # Chaves são usadas para armazenar os valores no session_state
-        aluguer = st.number_input("🏠 Aluguer (€)", min_value=0.0, value=aluguer_padrao, step=1.0, key='aluguer_input')
-        perc_aluguer = st.number_input("👔 Percentual sobre o Apuro (%)", min_value=0.0, value=perc_aluguer_padrao, step=0.5, key='perc_aluguer_input')
-
+        st.number_input("🏠 Aluguer (€)", min_value=0.0, value=st.session_state.default_aluguer, step=1.0, key='aluguer_input')
+        st.number_input("👔 Percentual (%)", min_value=0.0, value=st.session_state.default_perc_aluguer, step=0.5, key='perc_aluguer_input')
     with col2:
         st.subheader("Opção 2")
-        seguro = st.number_input("🛡️ Seguro (€)", min_value=0.0, value=seguro_padrao, step=1.0, key='seguro_input')
-        perc_seguro = st.number_input("👔 Percentual sobre o Apuro (%)", min_value=0.0, value=perc_seguro_padrao, step=0.5, key='perc_seguro_input')
-        manutencao = st.number_input("🛠️ Despesas de Manutenção (€)", min_value=0.0, value=manutencao_padrao, step=1.0, key='manutencao_input')
+        st.number_input("🛡️ Seguro (€)", min_value=0.0, value=st.session_state.default_seguro, step=1.0, key='seguro_input')
+        st.number_input("👔 Percentual (%)", min_value=0.0, value=st.session_state.default_perc_seguro, step=0.5, key='perc_seguro_input')
+        st.number_input("🛠️ Manutenção (€)", min_value=0.0, value=st.session_state.default_manutencao, step=1.0, key='manutencao_input')
+        
+    # Novo botão para salvar as alterações padrão
+    st.button("💾 Salvar Alterações Padrão", on_click=save_defaults)
+
 else:
-    # Usa os valores padrão se os inputs não estiverem visíveis
-    aluguer = aluguer_padrao
-    perc_aluguer = perc_aluguer_padrao
-    seguro = seguro_padrao
-    perc_seguro = perc_seguro_padrao
-    manutencao = manutencao_padrao
     st.info("Valores padrão das opções estão sendo usados. Clique no botão acima para modificá-los.")
 
 st.markdown("---")
@@ -60,26 +68,29 @@ st.markdown("---")
 if st.button("Calcular 🔹", type="primary"):
     # Subtrair combustível do apuro para obter o valor líquido
     apuro_liquido = apuro - desc_combustivel
-
-    # Pega os valores atuais (padrão ou modificados)
-    aluguer_atual = st.session_state.get('aluguer_input', aluguer_padrao)
-    perc_aluguer_atual = st.session_state.get('perc_aluguer_input', perc_aluguer_padrao)
-    seguro_atual = st.session_state.get('seguro_input', seguro_padrao)
-    perc_seguro_atual = st.session_state.get('perc_seguro_input', perc_seguro_padrao)
-    manutencao_atual = st.session_state.get('manutencao_input', manutencao_padrao) # Novo valor atual
+    
+    # Pega os valores atuais (padrão ou modificados e salvos)
+    aluguer_atual = st.session_state.default_aluguer
+    perc_aluguer_atual = st.session_state.default_perc_aluguer
+    seguro_atual = st.session_state.default_seguro
+    perc_seguro_atual = st.session_state.default_perc_seguro
+    manutencao_atual = st.session_state.default_manutencao
 
     # Cálculo do que sobra em cada opção
     sobra_opcao1 = apuro_liquido - (apuro * perc_aluguer_atual / 100) - aluguer_atual
-    sobra_opcao2 = apuro_liquido - (apuro * perc_seguro_atual / 100) - seguro_atual - manutencao_atual # Adicionado a dedução de manutenção
+    sobra_opcao2 = apuro_liquido - (apuro * perc_seguro_atual / 100) - seguro_atual - manutencao_atual
     
     st.subheader("📊 Resultados:")
-    st.markdown(f"**Apuro Líquido:** {apuro_liquido:,.2f} € (apuro total - combustível)")
+    st.metric("Apuro Líquido", f"{apuro_liquido:,.2f} €", help="Apuro total menos o desconto de combustível.")
     st.markdown("---")
 
     # Exibir resultados detalhados
     st.markdown("### Visão Geral")
-    st.write(f"Na **Opção 1**, o valor final que sobra é: **{sobra_opcao1:,.2f} €**")
-    st.write(f"Na **Opção 2**, o valor final que sobra é: **{sobra_opcao2:,.2f} €**")
+    col3, col4 = st.columns(2)
+    with col3:
+        st.metric(f"Sobra na Opção 1", f"{sobra_opcao1:,.2f} €")
+    with col4:
+        st.metric(f"Sobra na Opção 2", f"{sobra_opcao2:,.2f} €")
     
     # Determinar e exibir a melhor opção
     if sobra_opcao1 > sobra_opcao2:
