@@ -20,7 +20,7 @@ aluguer_padrao = 280.0
 perc_aluguer_padrao = 7.0
 seguro_padrao = 45.0
 perc_seguro_padrao = 12.0
-manutencao_padrao = 50.0  # Novo valor padrão para manutenção
+manutencao_padrao = 20.0  # Novo valor padrão para manutenção
 
 # Inicializa o estado de exibição se ainda não existir
 if 'show_inputs' not in st.session_state:
