@@ -1,103 +1,60 @@
 import streamlit as st
 
 # Configuração da página
-st.set_page_config(page_title="Calculadora de Descontos", layout="wide")
-st.title("💸 Calculadora de Descontos")
-st.markdown("Escolha o modo de utilização abaixo:")
+st.set_page_config(page_title="Calculadora de Descontos (sem Uber)", layout="centered")
+st.title("💸 Calculadora de Descontos (sem Uber)")
+st.markdown("Calcule rapidamente os descontos da Empresa, Aluguer, Seguro e Combustível.")
 
-# Menu de escolha
-modo = st.radio("Selecione o modo:", ["🔹 Modo Normal", "⚖️ Comparação de Cenários"])
+# Entrada principal
+st.subheader("Insira os valores:")
+valor_inicial = st.number_input("💰 Valor inicial", min_value=0.0, value=700.0, step=10.0)
 
-# --------------------------------------------------------
-# MODO NORMAL (igual ao app_sem_uber original, mas ajustado)
-# --------------------------------------------------------
-if modo == "🔹 Modo Normal":
-    st.subheader("Insira os valores:")
+# Linha dividida em 2 colunas
+col1, col2 = st.columns(2)
+with col1:
+    perc_esq = st.number_input("👔 Empresa (%)", min_value=0.0, value=7.0, step=0.5)
+    aluguer = st.number_input("🏠 Aluguer (€)", min_value=0.0, value=280.0, step=1.0)
+with col2:
+    perc_dir = st.number_input("👔 Empresa (%)", min_value=0.0, value=12.0, step=0.5)
+    seguro = st.number_input("🛡️ Seguro (€)", min_value=0.0, value=45.0, step=1.0)
 
-    valor_inicial = st.number_input("💰 Valor inicial", min_value=0.0, value=100.0, step=10.0)
-    perc_pat = st.number_input("👔 Percentagem Patrão (%)", min_value=0.0, value=12.0, step=1.0)
-    desc_seguro = st.number_input("🛡️ Desconto Seguro", min_value=0.0, value=6.0, step=1.0)
-    desc_combustivel = st.number_input("⛽ Desconto Combustível", min_value=0.0, value=30.0, step=1.0)
+desc_combustivel = st.number_input("⛽ Desconto Combustível (€)", min_value=0.0, value=200.0, step=1.0)
 
-    st.markdown("---")
+st.markdown("---")
 
-    if st.button("Calcular 🔹", use_container_width=True):
-        st.subheader("📊 Resultado detalhado:")
+if st.button("Calcular 🔹", use_container_width=True):
+    st.subheader("📊 Resultados Detalhados:")
 
-        valor = valor_inicial
+    # Cálculos dos descontos
+    desconto_dir = valor_inicial * (perc_dir / 100)
+    desconto_esq = valor_inicial * (perc_esq / 100)
 
-        # Patrão
-        desconto_pat = valor * (perc_pat / 100)
-        valor -= desconto_pat
-        st.markdown(f"<div style='background-color:#CCE5FF;padding:10px;border-radius:5px'>"
-                    f"- {perc_pat}% Patrão: -{desconto_pat:.2f} → {valor:.2f}</div>", unsafe_allow_html=True)
+    # Valores intermediários
+    subtotal1 = valor_inicial - desconto_dir
+    subtotal2 = subtotal1 - desconto_esq
+    subtotal3 = subtotal2 - aluguer
+    subtotal4 = subtotal3 - seguro
+    subtotal_final = subtotal4 - desc_combustivel
 
-        # Seguro
-        valor -= desc_seguro
-        st.markdown(f"<div style='background-color:#CCFFCC;padding:10px;border-radius:5px'>"
-                    f"- Seguro: -{desc_seguro:.2f} → {valor:.2f}</div>", unsafe_allow_html=True)
+    # Mostrar cada desconto em cores diferentes
+    st.markdown(f"<div style='background-color:#CCE5FF;padding:10px;border-radius:5px'>"
+                f"- Empresa direita ({perc_dir}%): -{desconto_dir:.2f} € → {subtotal1:.2f} €</div>", unsafe_allow_html=True)
 
-        # Combustível
-        valor -= desc_combustivel
-        st.markdown(f"<div style='background-color:#FFF2CC;padding:10px;border-radius:5px'>"
-                    f"- Combustível: -{desc_combustivel:.2f} → {valor:.2f}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='background-color:#FFD9B3;padding:10px;border-radius:5px'>"
+                f"- Empresa esquerda ({perc_esq}%): -{desconto_esq:.2f} € → {subtotal2:.2f} €</div>", unsafe_allow_html=True)
 
-        st.success(f"💰 Valor final após descontos: {valor:.2f}")
+    st.markdown(f"<div style='background-color:#CCFFCC;padding:10px;border-radius:5px'>"
+                f"- Aluguer: -{aluguer:.2f} € → {subtotal3:.2f} €</div>", unsafe_allow_html=True)
 
-# --------------------------------------------------------
-# MODO COMPARAÇÃO
-# --------------------------------------------------------
-else:
-    st.subheader("Comparador: Empresa 7% + Aluguer 280€ vs 12% + Seguro 45€")
+    st.markdown(f"<div style='background-color:#FFCCCC;padding:10px;border-radius:5px'>"
+                f"- Seguro: -{seguro:.2f} € → {subtotal4:.2f} €</div>", unsafe_allow_html=True)
 
-    valor_inicial = st.number_input("💰 Valor inicial", min_value=0.0, value=800.0, step=10.0)
-    combustivel = st.number_input("⛽ Combustível", min_value=0.0, value=210.0, step=10.0)
+    st.markdown(f"<div style='background-color:#FFF2CC;padding:10px;border-radius:5px'>"
+                f"- Combustível: -{desc_combustivel:.2f} € → {subtotal_final:.2f} €</div>", unsafe_allow_html=True)
 
-    st.markdown("---")
-
-    if st.button("Comparar ⚖️", use_container_width=True):
-        # Cenário A
-        valor_a = valor_inicial
-        desconto_a = valor_a * 0.07
-        valor_a -= desconto_a
-        valor_a -= 280
-        valor_a -= combustivel
-
-        # Cenário B
-        valor_b = valor_inicial
-        desconto_b = valor_b * 0.12
-        valor_b -= desconto_b
-        valor_b -= 45
-        valor_b -= combustivel
-
-        # Mostrar comparação
-        col1, col2 = st.columns(2)
-
-        with col1:
-            st.subheader("📊 Cenário A (7% + Aluguer 280€)")
-            st.markdown(f"""
-            - Empresa 7%: -{desconto_a:.2f}  
-            - Aluguer: -280.00  
-            - Combustível: -{combustivel:.2f}  
-            ---
-            ✅ **Valor final: {valor_a:.2f}**
-            """)
-
-        with col2:
-            st.subheader("📊 Cenário B (12% + Seguro 45€)")
-            st.markdown(f"""
-            - Empresa 12%: -{desconto_b:.2f}  
-            - Seguro: -45.00  
-            - Combustível: -{combustivel:.2f}  
-            ---
-            ✅ **Valor final: {valor_b:.2f}**
-            """)
-
-        # Melhor opção
-        st.markdown("---")
-        if valor_a > valor_b:
-            st.success(f"💡 Melhor opção: **Cenário A (7% + Aluguer 280€)** → Diferença de {valor_a - valor_b:.2f} €")
-        elif valor_b > valor_a:
-            st.success(f"💡 Melhor opção: **Cenário B (12% + Seguro 45€)** → Diferença de {valor_b - valor_a:.2f} €")
-        else:
-            st.info("⚖️ Ambos os cenários dão o mesmo resultado.")
+    # Resultados finais lado a lado
+    res1, res2 = st.columns(2)
+    with res1:
+        st.success(f"💰 Resultado 1 (Empresa direita + Combustível): {valor_inicial - desconto_dir - desc_combustivel:.2f} €")
+    with res2:
+        st.success(f"💰 Resultado 2 (Empresa esquerda + Empresa direita + Aluguer + Seguro + Combustível): {subtotal_final:.2f} €")
