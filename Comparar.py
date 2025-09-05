@@ -10,18 +10,23 @@ DEFAULTS = {
     'perc_aluguer': 7.0,
     'seguro': 45.0,
     'perc_seguro': 12.0,
-    'manutencao': 20.0
+    'manutencao': 50.0
 }
 
 # Inicializa o estado da sessão com os valores padrão, se ainda não existirem
+# A chave "show_inputs" controla a visibilidade dos campos de entrada
+if 'show_inputs' not in st.session_state:
+    st.session_state.show_inputs = False
+
+# Inicializa os valores padrão e os valores que serão usados nos inputs
 for key, value in DEFAULTS.items():
-    if f'default_{key}' not in st.session_state:
-        st.session_state[f'default_{key}'] = value
+    if key not in st.session_state:
+        st.session_state[key] = value
 
 # --- Entradas do Usuário ---
 st.header("Entradas do Usuário")
 
-apuro = st.number_input("💰 Apuro total (€)", min_value=0.0, value=700.0, step=10.0, help="O valor total bruto que você recebeu.")
+apuro = st.number_input("💰 Apuro total (€)", min_value=0.0, value=800.0, step=10.0, help="O valor total bruto que você recebeu.")
 desc_combustivel = st.number_input("⛽ Desconto de Combustível (€)", min_value=0.0, value=200.0, step=1.0, help="O valor que você gasta com combustível e que é deduzido do apuro.")
 
 st.markdown("---")
@@ -31,34 +36,21 @@ st.header("Opções da Empresa")
 
 # Botão para alternar a visibilidade dos campos de entrada
 if st.button("Modificar Opções Padrão"):
-    st.session_state.show_inputs = not st.session_state.get('show_inputs', False)
+    st.session_state.show_inputs = not st.session_state.show_inputs
 
-def save_defaults():
-    """Função de callback para salvar os valores dos inputs como novos padrões."""
-    st.session_state.default_aluguer = st.session_state.aluguer_input
-    st.session_state.default_perc_aluguer = st.session_state.perc_aluguer_input
-    st.session_state.default_seguro = st.session_state.seguro_input
-    st.session_state.default_perc_seguro = st.session_state.perc_seguro_input
-    st.session_state.default_manutencao = st.session_state.manutencao_input
-    st.success("Novos valores padrão salvos com sucesso!")
-
-if st.session_state.get('show_inputs', False):
+if st.session_state.show_inputs:
     # Colunas para organizar as opções lado a lado
     col1, col2 = st.columns(2)
 
     with col1:
         st.subheader("Opção 1")
-        st.number_input("🏠 Aluguer (€)", min_value=0.0, value=st.session_state.default_aluguer, step=1.0, key='aluguer_input')
-        st.number_input("👔 Percentual (%)", min_value=0.0, value=st.session_state.default_perc_aluguer, step=0.5, key='perc_aluguer_input')
+        st.number_input("🏠 Aluguer (€)", min_value=0.0, value=st.session_state.aluguer, step=1.0, key='aluguer')
+        st.number_input("👔 Percentual (%)", min_value=0.0, value=st.session_state.perc_aluguer, step=0.5, key='perc_aluguer')
     with col2:
         st.subheader("Opção 2")
-        st.number_input("🛡️ Seguro (€)", min_value=0.0, value=st.session_state.default_seguro, step=1.0, key='seguro_input')
-        st.number_input("👔 Percentual (%)", min_value=0.0, value=st.session_state.default_perc_seguro, step=0.5, key='perc_seguro_input')
-        st.number_input("🛠️ Manutenção (€)", min_value=0.0, value=st.session_state.default_manutencao, step=1.0, key='manutencao_input')
-        
-    # Novo botão para salvar as alterações padrão
-    st.button("💾 Salvar Alterações Padrão", on_click=save_defaults)
-
+        st.number_input("🛡️ Seguro (€)", min_value=0.0, value=st.session_state.seguro, step=1.0, key='seguro')
+        st.number_input("👔 Percentual (%)", min_value=0.0, value=st.session_state.perc_seguro, step=0.5, key='perc_seguro')
+        st.number_input("🛠️ Manutenção (€)", min_value=0.0, value=st.session_state.manutencao, step=1.0, key='manutencao')
 else:
     st.info("Valores padrão das opções estão sendo usados. Clique no botão acima para modificá-los.")
 
@@ -69,12 +61,12 @@ if st.button("Calcular 🔹", type="primary"):
     # Subtrair combustível do apuro para obter o valor líquido
     apuro_liquido = apuro - desc_combustivel
     
-    # Pega os valores atuais (padrão ou modificados e salvos)
-    aluguer_atual = st.session_state.default_aluguer
-    perc_aluguer_atual = st.session_state.default_perc_aluguer
-    seguro_atual = st.session_state.default_seguro
-    perc_seguro_atual = st.session_state.default_perc_seguro
-    manutencao_atual = st.session_state.default_manutencao
+    # Pega os valores atuais do estado da sessão (padrão ou modificados)
+    aluguer_atual = st.session_state.aluguer
+    perc_aluguer_atual = st.session_state.perc_aluguer
+    seguro_atual = st.session_state.seguro
+    perc_seguro_atual = st.session_state.perc_seguro
+    manutencao_atual = st.session_state.manutencao
 
     # Cálculo do que sobra em cada opção
     sobra_opcao1 = apuro_liquido - (apuro * perc_aluguer_atual / 100) - aluguer_atual
