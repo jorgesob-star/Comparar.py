@@ -21,7 +21,7 @@ for key, value in DEFAULTS.items():
 # --- Entradas do Usuário ---
 st.header("Entradas do Usuário")
 
-apuro = st.number_input("💰 Apuro total (€)", min_value=0.0, value=800.0, step=10.0, help="O valor total bruto que você recebeu.")
+apuro = st.number_input("💰 Apuro total (€)", min_value=0.0, value=700.0, step=10.0, help="O valor total bruto que você recebeu.")
 desc_combustivel = st.number_input("⛽ Desconto de Combustível (€)", min_value=0.0, value=200.0, step=1.0, help="O valor que você gasta com combustível e que é deduzido do apuro.")
 
 st.markdown("---")
