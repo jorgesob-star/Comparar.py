@@ -20,7 +20,7 @@ st.markdown("Compare os lucros entre usar carro alugado e carro próprio para tr
 if 'show_params' not in st.session_state:
     st.session_state.show_params = False
 if 'rental_cost' not in st.session_state:
-    st.session_state.rental_cost = 280.0
+    st.session_state.rental_cost = 270.0
 if 'rental_commission' not in st.session_state:
     st.session_state.rental_commission = 6.0
 if 'own_insurance' not in st.session_state:
