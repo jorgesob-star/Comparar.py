@@ -22,7 +22,7 @@ if 'show_params' not in st.session_state:
 if 'rental_cost' not in st.session_state:
     st.session_state.rental_cost = 280.0
 if 'rental_commission' not in st.session_state:
-    st.session_state.rental_commission = 7.0
+    st.session_state.rental_commission = 6.0
 if 'own_insurance' not in st.session_state:
     st.session_state.own_insurance = 45.0
 if 'own_maintenance' not in st.session_state:
