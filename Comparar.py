@@ -22,13 +22,13 @@ if 'show_params' not in st.session_state:
 if 'rental_cost' not in st.session_state:
     st.session_state.rental_cost = 280.0
 if 'rental_commission' not in st.session_state:
-    st.session_state.rental_commission = 7
+    st.session_state.rental_commission = 7.0
 if 'own_insurance' not in st.session_state:
     st.session_state.own_insurance = 45.0
 if 'own_maintenance' not in st.session_state:
     st.session_state.own_maintenance = 50.0
 if 'own_commission' not in st.session_state:
-    st.session_state.own_commission = 12
+    st.session_state.own_commission = 12.0
 if 'extra_expenses' not in st.session_state:
     st.session_state.extra_expenses = 0.0
 if 'include_extra_expenses' not in st.session_state:
@@ -95,7 +95,7 @@ with extra_col2:
 if st.button("⚙️ Parâmetros Avançados"):
     st.session_state.show_params = not st.session_state.show_params
 
-# Mostrar parâmetros apenas se show_params for True
+# Mostrar parâmetros apenas if show_params for True
 if st.session_state.show_params:
     st.header("⚙️ Parâmetros Avançados")
     
@@ -111,12 +111,13 @@ if st.session_state.show_params:
             step=10.0
         )
         
-        st.session_state.rental_commission = st.slider(
+        st.session_state.rental_commission = st.number_input(
             "Comissão com Carro Alugado (%):", 
-            min_value=0, 
-            max_value=30, 
+            min_value=0.0, 
+            max_value=30.0, 
             value=st.session_state.rental_commission, 
-            step=1
+            step=0.5,
+            help="Percentual que a plataforma retém pelos serviços com carro alugado"
         )
     
     with adv_col2:
@@ -137,12 +138,13 @@ if st.session_state.show_params:
             help="Custo semanal estimado com manutenção do veículo próprio"
         )
         
-        st.session_state.own_commission = st.slider(
+        st.session_state.own_commission = st.number_input(
             "Comissão com Carro Próprio (%):", 
-            min_value=0, 
-            max_value=30, 
+            min_value=0.0, 
+            max_value=30.0, 
             value=st.session_state.own_commission, 
-            step=1
+            step=0.5,
+            help="Percentual que a plataforma retém pelos serviços com carro próprio"
         )
 
 # ---
