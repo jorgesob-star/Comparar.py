@@ -48,7 +48,7 @@ with col1:
     weekly_earnings = st.number_input(
         "Ganhos Semanais (€):", 
         min_value=0.0, 
-        value=926.0, 
+        value=999.0, 
         step=50.0,
         help="Valor total ganho por semana antes de despesas"
     )
@@ -56,7 +56,7 @@ with col1:
     weekly_hours = st.number_input(
         "Horas Trabalhadas por Semana:", 
         min_value=0.0, 
-        value=53.0, 
+        value=56.0, 
         step=1.0,
         help="Total de horas trabalhadas na semana"
     )
@@ -64,7 +64,7 @@ with col1:
     fuel_cost = st.number_input(
         "Custo Semanal com Combustível (€):", 
         min_value=0.0, 
-        value=200.0, 
+        value=170.0, 
         step=10.0,
         help="Custo semanal estimado com combustível"
     )
