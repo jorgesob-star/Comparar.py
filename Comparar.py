@@ -48,7 +48,7 @@ with col1:
     weekly_earnings = st.number_input(
         "Ganhos Semanais (€):", 
         min_value=0.0, 
-        value=999.0, 
+        value=1000.0, 
         step=50.0,
         help="Valor total ganho por semana antes de despesas"
     )
