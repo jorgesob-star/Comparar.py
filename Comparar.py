@@ -26,7 +26,7 @@ if 'rental_commission' not in st.session_state:
 if 'own_insurance' not in st.session_state:
     st.session_state.own_insurance = 45.0
 if 'own_maintenance' not in st.session_state:
-    st.session_state.own_maintenance = 15.0
+    st.session_state.own_maintenance = 25.0
 if 'own_commission' not in st.session_state:
     st.session_state.own_commission = 12.0
 if 'extra_expenses' not in st.session_state:
@@ -48,7 +48,7 @@ with col1:
     weekly_earnings = st.number_input(
         "Ganhos Semanais (€):", 
         min_value=0.0, 
-        value=1000.0, 
+        value=900.0, 
         step=50.0,
         help="Valor total ganho por semana antes de despesas"
     )
@@ -56,7 +56,7 @@ with col1:
     weekly_hours = st.number_input(
         "Horas Trabalhadas por Semana:", 
         min_value=0.0, 
-        value=56.0, 
+        value=50.0, 
         step=1.0,
         help="Total de horas trabalhadas na semana"
     )
