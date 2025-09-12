@@ -18,7 +18,7 @@ st.set_page_config(
 # Inicialização do estado
 # -------------------------------
 defaults = {
-    "rental_cost": 250.0,
+    "rental_cost": 270.0,
     "rental_commission": 6.0,
     "own_insurance": 45.0,
     "own_maintenance": 25.0,
@@ -44,7 +44,7 @@ st.markdown("Compare os lucros entre carro alugado e carro próprio.")
 # -------------------------------
 st.header("📊 Dados de Entrada")
 weekly_earnings = st.number_input("Ganhos Semanais (€)", min_value=0.0, value=700.0, step=10.0)
-weekly_hours = st.number_input("Horas Semanais", min_value=0, value=40, step=1)
+weekly_hours = st.number_input("Horas Semanais", min_value=0, value=50, step=1)
 fuel_cost = st.number_input("Combustível (€)", min_value=0.0, value=200.0, step=5.0)
 
 # -------------------------------
@@ -81,8 +81,8 @@ with st.expander("⚙️ Parâmetros Avançados"):
 # -------------------------------
 st.header("🧮 Calcular")
 
-# Detecta largura da tela (via query_params) para layout responsivo
-screen_width = int(st.query_params.get("width", [0])[0])  # substitui experimental_get_query_params
+# Detecta largura da tela via query_params
+screen_width = int(st.query_params.get("width", [0])[0])
 
 if screen_width < 600:
     # Mobile: empilhar verticalmente
@@ -147,6 +147,17 @@ if st.session_state.calculation_type:
     })
     st.dataframe(df_resultados, use_container_width=True)
 
+    # -------------------------------
+    # Cores automáticas do gráfico conforme tema
+    # -------------------------------
+    theme = st.get_option("theme.base")  # "light" ou "dark"
+    if theme == "dark":
+        bar_colors = alt.Scale(domain=["Carro Próprio", "Carro Alugado"],
+                               range=["#FFB347", "#1E90FF"])
+    else:
+        bar_colors = alt.Scale(domain=["Carro Próprio", "Carro Alugado"],
+                               range=["#FF7F50", "#6495ED"])
+
     # Gráfico comparativo
     if len(resultados) > 1:
         df_chart = pd.DataFrame({
@@ -156,7 +167,7 @@ if st.session_state.calculation_type:
         chart = alt.Chart(df_chart).mark_bar(size=60).encode(
             x=alt.X("Opção", sort=None),
             y="Lucro (€)",
-            color="Opção"
+            color=alt.Color("Opção", scale=bar_colors)
         ).properties(height=300)
         st.altair_chart(chart, use_container_width=True)
 
