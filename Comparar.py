@@ -1,5 +1,5 @@
 # -------------------------------
-# Imports obrigatórios
+# Imports
 # -------------------------------
 import streamlit as st
 import pandas as pd
@@ -34,13 +34,13 @@ for key, val in defaults.items():
         st.session_state[key] = val
 
 # -------------------------------
-# Título da aplicação
+# Título
 # -------------------------------
 st.title("🚗 Comparador de Ganhos TVDE")
-st.markdown("Compare os lucros entre usar carro alugado e carro próprio para trabalhar como motorista TVDE.")
+st.markdown("Compare os lucros entre carro alugado e carro próprio.")
 
 # -------------------------------
-# Entrada de dados
+# Dados de entrada
 # -------------------------------
 st.header("📊 Dados de Entrada")
 weekly_earnings = st.number_input("Ganhos Semanais (€)", min_value=0.0, value=700.0, step=10.0)
@@ -48,23 +48,22 @@ weekly_hours = st.number_input("Horas Semanais", min_value=0, value=50, step=1)
 fuel_cost = st.number_input("Combustível (€)", min_value=0.0, value=200.0, step=5.0)
 
 # -------------------------------
-# Despesas Extras
+# Despesas extras
 # -------------------------------
 st.header("💸 Despesas Extras")
 st.session_state.include_extra_expenses = st.checkbox(
-    "Incluir despesas extras",
-    value=st.session_state.include_extra_expenses,
+    "Incluir despesas extras", value=st.session_state.include_extra_expenses
 )
 if st.session_state.include_extra_expenses:
     st.session_state.extra_expenses = st.number_input(
         "Despesas Extras (€)",
         min_value=0.0,
         value=st.session_state.extra_expenses,
-        step=5.0,
+        step=5.0
     )
 
 # -------------------------------
-# Parâmetros Avançados
+# Parâmetros avançados
 # -------------------------------
 with st.expander("⚙️ Parâmetros Avançados"):
     st.subheader("Carro Alugado")
@@ -78,19 +77,33 @@ with st.expander("⚙️ Parâmetros Avançados"):
     st.number_input("Slot TVDE (€)", min_value=0.0, step=5.0, key="own_slot_tvde")
 
 # -------------------------------
-# Botões de Cálculo
+# Botões de cálculo (mobile-first)
 # -------------------------------
 st.header("🧮 Calcular")
-btn1, btn2, btn3 = st.columns([1,1,1], gap="small")
-with btn1:
+
+# Detecta largura da tela (via query_params) para layout responsivo
+screen_width = int(st.query_params.get("width", [0])[0])  # substitui experimental_get_query_params
+
+if screen_width < 600:
+    # Mobile: empilhar verticalmente
     if st.button("🚘 Alugado", use_container_width=True):
         st.session_state.calculation_type = "alugado"
-with btn2:
     if st.button("🚗 Próprio", use_container_width=True):
         st.session_state.calculation_type = "próprio"
-with btn3:
     if st.button("⚖️ Comparar", use_container_width=True):
         st.session_state.calculation_type = "comparar"
+else:
+    # Desktop: colunas horizontais
+    btn1, btn2, btn3 = st.columns([1, 1, 1], gap="small")
+    with btn1:
+        if st.button("🚘 Alugado", use_container_width=True):
+            st.session_state.calculation_type = "alugado"
+    with btn2:
+        if st.button("🚗 Próprio", use_container_width=True):
+            st.session_state.calculation_type = "próprio"
+    with btn3:
+        if st.button("⚖️ Comparar", use_container_width=True):
+            st.session_state.calculation_type = "comparar"
 
 # -------------------------------
 # Função de cálculo
@@ -121,11 +134,10 @@ if st.session_state.calculation_type:
 
     st.subheader("📊 Resultados")
 
-    # Métricas
-    cols = st.columns(len(resultados))
-    for i, (tipo, lucro) in enumerate(resultados.items()):
+    # Métricas (mobile-friendly)
+    for tipo, lucro in resultados.items():
         lucro_hora = lucro / weekly_hours if weekly_hours > 0 else 0
-        cols[i].metric(label=tipo, value=f"€ {lucro:,.2f}", delta=f"{lucro_hora:.2f} €/h")
+        st.metric(label=tipo, value=f"€ {lucro:,.2f}", delta=f"{lucro_hora:.2f} €/h")
 
     # Tabela detalhada
     df_resultados = pd.DataFrame({
@@ -149,7 +161,7 @@ if st.session_state.calculation_type:
         st.altair_chart(chart, use_container_width=True)
 
 # -------------------------------
-# Rodapé com dicas
+# Dicas
 # -------------------------------
 with st.expander("💡 Dicas e Informações"):
     st.markdown("""
