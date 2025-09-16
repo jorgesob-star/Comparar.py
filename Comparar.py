@@ -22,7 +22,7 @@ defaults = {
     "rental_commission": 6.0,
     "own_insurance": 45.0,
     "own_maintenance": 25.0,
-    "own_commission": 10.0,
+    "own_commission": 12.0,
     "own_slot_tvde": 0.0,
     "extra_expenses": 0.0,
     "include_extra_expenses": False,
