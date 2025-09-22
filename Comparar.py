@@ -41,9 +41,14 @@ st.markdown("Compare os lucros entre carro alugado e carro próprio.")
 # Dados de entrada
 # -------------------------------
 st.header("📊 Dados de Entrada")
-weekly_earnings = st.number_input("Ganhos Semanais (€)", min_value=0.0, value=750.0, step=10.0)
+weekly_earnings = st.number_input("Ganhos Semanais (€)", min_value=0.0, value=855.0, step=10.0)
 weekly_hours = st.number_input("Horas Semanais", min_value=0, value=50, step=1)
 fuel_cost = st.number_input("Combustível (€)", min_value=0.0, value=200.0, step=5.0)
+
+# Novos campos
+tips = st.number_input("Gorjetas (€)", min_value=0.0, value=0.0, step=5.0)
+cancellation_fees = st.number_input("Taxas de Cancelamento (€)", min_value=0.0, value=0.0, step=5.0)
+tolls = st.number_input("Portagens Pagas (€)", min_value=0.0, value=0.0, step=5.0)
 
 # -------------------------------
 # Despesas extras
@@ -83,15 +88,26 @@ def calcular_lucro(earnings, custos, comissao_pct, extra_expenses=0.0):
     lucro_liquido = earnings - total_custos - comissao_valor
     return lucro_liquido, comissao_valor
 
-def calcular_ganhos(weekly_earnings, weekly_hours, fuel_cost, calculation_type):
+def calcular_ganhos(weekly_earnings, weekly_hours, fuel_cost, tips, cancellation_fees, tolls, calculation_type):
     resultados = {}
     detalhes = []
 
+    # Ganhos ajustados (acrescentar gorjetas e taxas de cancelamento)
+    ganhos_totais = weekly_earnings + tips + cancellation_fees
+
+    # Custos ajustados (acrescentar portagens)
     extra = st.session_state.extra_expenses if st.session_state.include_extra_expenses else 0.0
+    custos_portagens = tolls
 
     if calculation_type in ["próprio", "comparar"]:
-        custos = st.session_state.own_insurance + st.session_state.own_maintenance + st.session_state.own_slot_tvde + fuel_cost
-        lucro, comissao_valor = calcular_lucro(weekly_earnings, custos, st.session_state.own_commission, extra)
+        custos = (
+            st.session_state.own_insurance
+            + st.session_state.own_maintenance
+            + st.session_state.own_slot_tvde
+            + fuel_cost
+            + custos_portagens
+        )
+        lucro, comissao_valor = calcular_lucro(ganhos_totais, custos, st.session_state.own_commission, extra)
         resultados["Carro Próprio"] = lucro
         detalhes.append({
             "Opção": "Carro Próprio",
@@ -99,21 +115,29 @@ def calcular_ganhos(weekly_earnings, weekly_hours, fuel_cost, calculation_type):
             "Manutenção (€)": st.session_state.own_maintenance,
             "Slot TVDE (€)": st.session_state.own_slot_tvde,
             "Combustível (€)": fuel_cost,
+            "Portagens (€)": custos_portagens,
             "Despesas Extras (€)": extra,
+            "Gorjetas (€)": tips,
+            "Cancelamentos (€)": cancellation_fees,
+            "Ganhos Totais (€)": ganhos_totais,
             "Comissão (%)": st.session_state.own_commission,
             "Comissão (€)": comissao_valor,
             "Lucro Líquido (€)": lucro
         })
 
     if calculation_type in ["alugado", "comparar"]:
-        custos = st.session_state.rental_cost + fuel_cost
-        lucro, comissao_valor = calcular_lucro(weekly_earnings, custos, st.session_state.rental_commission, extra)
+        custos = st.session_state.rental_cost + fuel_cost + custos_portagens
+        lucro, comissao_valor = calcular_lucro(ganhos_totais, custos, st.session_state.rental_commission, extra)
         resultados["Carro Alugado"] = lucro
         detalhes.append({
             "Opção": "Carro Alugado",
             "Aluguel (€)": st.session_state.rental_cost,
             "Combustível (€)": fuel_cost,
+            "Portagens (€)": custos_portagens,
             "Despesas Extras (€)": extra,
+            "Gorjetas (€)": tips,
+            "Cancelamentos (€)": cancellation_fees,
+            "Ganhos Totais (€)": ganhos_totais,
             "Comissão (%)": st.session_state.rental_commission,
             "Comissão (€)": comissao_valor,
             "Lucro Líquido (€)": lucro
@@ -147,7 +171,15 @@ with btn_cols[2]:
 # Cards e gráficos
 # -------------------------------
 if st.session_state.calculation_type:
-    resultados, detalhes = calcular_ganhos(weekly_earnings, weekly_hours, fuel_cost, st.session_state.calculation_type)
+    resultados, detalhes = calcular_ganhos(
+        weekly_earnings,
+        weekly_hours,
+        fuel_cost,
+        tips,
+        cancellation_fees,
+        tolls,
+        st.session_state.calculation_type
+    )
     
     st.subheader("📊 Painéis de Lucro")
     cards = st.columns(len(resultados))
@@ -205,11 +237,14 @@ if st.session_state.calculation_type:
 # -------------------------------
 with st.expander("💡 Dicas e Informações"):
     st.markdown("""
-    - **Ganhos Semanais**: valor total recebido pelos serviços TVDE.  
+    - **Ganhos Semanais**: valor recebido pelos serviços TVDE (exclui gorjetas e cancelamentos).  
+    - **Gorjetas**: valores adicionais recebidos diretamente dos clientes.  
+    - **Taxas de Cancelamento**: valores pagos pela plataforma quando o cliente cancela a viagem.  
+    - **Portagens**: custos de autoestradas pagos durante o trabalho.  
     - **Horas Semanais**: total de horas trabalhadas (incluindo espera).  
     - **Combustível**: gasto médio semanal.  
     - **Comissão**: taxa que a plataforma retém.  
     - **Aluguel**: custo semanal do carro alugado.  
     - **Seguro / Manutenção / Slot TVDE**: custos semanais fixos do carro próprio.  
-    - **Despesas Extras**: portagens, estacionamento, lavagens, etc.  
+    - **Despesas Extras**: estacionamento, lavagens, etc.  
     """)
