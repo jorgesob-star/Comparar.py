@@ -20,9 +20,9 @@ st.set_page_config(
 defaults = {
     "rental_cost": 270.0,
     "rental_commission": 6.0,
-    "own_insurance": 45.0,
+    "own_insurance": 75.0,
     "own_maintenance": 25.0,
-    "own_commission": 12.0,
+    "own_commission": 10.0,
     "own_slot_tvde": 0.0,
     "extra_expenses": 0.0,
     "include_extra_expenses": False,
@@ -41,7 +41,7 @@ st.markdown("Compare os lucros entre carro alugado e carro próprio.")
 # Dados de entrada
 # -------------------------------
 st.header("📊 Dados de Entrada")
-weekly_earnings = st.number_input("Ganhos Semanais (€)", min_value=0.0, value=855.0, step=10.0)
+weekly_earnings = st.number_input("Ganhos Semanais (€)", min_value=0.0, value=800.0, step=10.0)
 weekly_hours = st.number_input("Horas Semanais", min_value=0, value=50, step=1)
 fuel_cost = st.number_input("Combustível (€)", min_value=0.0, value=200.0, step=5.0)
 
